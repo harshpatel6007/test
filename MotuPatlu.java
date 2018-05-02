@@ -1,4 +1,4 @@
-package com.harsh.java.practice.hackerEarth;
+package com.harsh.hackerearth;
 
 import java.util.Arrays;
 import java.util.Scanner;
@@ -21,7 +21,7 @@ public class MotuPatlu {
 				for(int j = 0; j < numOfIcecrams; j++) {
 					icecreamHeights[j] = sc.nextInt();
 				}
-				System.out.println(Arrays.toString(icecreamHeights));
+//				System.out.println(Arrays.toString(icecreamHeights));
 				printOutput(numOfIcecrams, icecreamHeights);
 			}
 		} catch(Exception e) {
@@ -32,31 +32,41 @@ public class MotuPatlu {
 	}
 
 	private static void printOutput(int numOfIcecreams, int[] icecreamHeights) {
-		int reachedIndex = 0;
-		int i = 0;
-		
-		for(i = numOfIcecreams - 1; i >= 0; i--) {
-			long heightPatlu = icecreamHeights[i];
+		int motuIceCreamCount = 0;
+		//iterate from last element to second element
+		for(int index = numOfIcecreams - 1; index > 0; index--) {
+			long heightPatlu = icecreamHeights[index];
 			long heightMotu = 2 * heightPatlu;
-			
-			for(int j = reachedIndex; j < i; j++) {
-				if(heightMotu > 0) {
-					if(icecreamHeights[j] > heightMotu) {
-						icecreamHeights[j] -= heightMotu;					
-					} else {
-						heightMotu -= icecreamHeights[j];
-						reachedIndex++;
-					}		
-				}						
+			//iterate from current position of Motu to current position of Patlu
+			for(int i = motuIceCreamCount; i < index; i++) {
+				if(heightMotu >= icecreamHeights[i]) {
+					heightMotu -= icecreamHeights[i];
+					motuIceCreamCount++;
+				} else {
+					icecreamHeights[i] -= heightMotu;
+					heightMotu = 0;
+				}
+				if(heightMotu <= 0) {
+					break;
+				}
 			}
-			
-			if(reachedIndex == (i - 1)) {
+			//Both reach at same Place, increase ice cream count of Motu
+			if(motuIceCreamCount == index - 1) {
+				motuIceCreamCount++;
+			}
+			//Motu reach Patlu's position, break
+			if(motuIceCreamCount == index) {
 				break;
 			}
-						
+		}
+		//Motu doesn't move anywhere
+		if(motuIceCreamCount == 0) {
+			motuIceCreamCount++;
 		}
 		
-		System.out.println(reachedIndex + " " + i);
+		int patluIceCreamCount = numOfIcecreams - motuIceCreamCount;
+		System.out.println(motuIceCreamCount + " " + patluIceCreamCount);
+		System.out.println(motuIceCreamCount > patluIceCreamCount ? "Motu" : (motuIceCreamCount == patluIceCreamCount ? "Tie" : "Patlu"));
 	}
 
 }
