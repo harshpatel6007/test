@@ -1,0 +1,257 @@
+Here is the explanation of how the Hello world example achieves the data-binding effect when the user enters text into the text field.
+
+	During the compilation phase:
+	the ng-model and input directive set up a keydown listener on the <input> control.
+	the interpolation sets up a $watch to be notified of name changes.
+
+	During the runtime phase:
+	Pressing an 'X' key causes the browser to emit a keydown event on the input control.
+	The input directive captures the change to the input's value and calls $apply("name = 'X';") to update the application model inside the AngularJS 
+		execution context.
+	AngularJS applies the name = 'X'; to the model.
+	The $digest loop begins
+	The $watch list detects a change on the name property and notifies the interpolation, which in turn updates the DOM.
+	AngularJS exits the execution context, which in turn exits the keydown event and with it the JavaScript execution context.
+	The browser re-renders the view with the updated text.
+	
+	
+$apply lifecycle : 
+
+	function $apply(expression) {
+		try {
+			$eval(expression);
+		} catch(error) {
+			$exceptionHandler(error);
+		} finally() {
+			$digest();
+		}
+	}
+
+Directive Syntax :
+
+	var myApp = angular.module('myApp',[]);
+	myApp.directive(function () {
+		return {
+			restrict : 'E', //E-element, A = attribute, C = class, M = comment
+			scope : {
+				customerInfo : '=info'
+			},
+			templateUrl : 'test/template.html'
+		}
+	});	
+	
+Scope : 
+
+	Scope is an object that refers to the application model. 
+	It is an execution context for expressions. 
+	Scopes are arranged in hierarchical structure which mimic the DOM structure of the application. 
+	Scopes can watch expressions and propagate events.
+	
+	Scope is the glue between application controller and the view. 
+	During the template linking phase the directives set up $watch expressions on the scope. 
+	The $watch allows the directives to be notified of property changes, which allows the directive to render the updated value to the DOM.
+	Both controllers and directives have reference to the scope, but not to each other.
+	
+	Scope Event Propogation : https://docs.angularjs.org/guide/scope#scope-events-propagation
+		$boradcast propogate event to current scope and all its child scopes.
+		$emit propogate event to current scope and all its parent scopes.
+	
+Directive types :
+	Observing Directives such as angular expression {{expression}}
+	Listener Directive such as ng-click
+	
+	Observing directives, such as double-curly expressions {{expression}},
+	register listeners using the $watch() method. 
+	This type of directive needs to be notified whenever the expression changes so that it can update the view.
+
+	Listener directives, such as ng-click, 
+	register a listener with the DOM. 
+	When the DOM listener fires, the directive executes the associated expression and updates the view using the $apply() method.
+	
+	
+Event loop : 
+	Enter the AngularJS execution context by calling scope.$apply(stimulusFn), where stimulusFn is the work you wish to do in the AngularJS execution context.
+	AngularJS executes the stimulusFn(), which typically modifies application state.
+	AngularJS enters the $digest loop. 
+		The loop is made up of two smaller loops which process $evalAsync queue and the $watch list.
+		The $digest loop keeps iterating until the model stabilizes, 
+			which means that the $evalAsync queue is empty and the $watch list does not detect any changes.
+	The $evalAsync queue is used to schedule work which needs to occur outside of current stack frame, but before the browser's view render.
+		This is usually done with setTimeout(0), but the setTimeout(0) approach suffers from slowness and may cause view flickering since the
+		browser renders the view after each event.
+	The $watch list is a set of expressions which may have changed since last iteration. 
+		If a change is detected then the $watch function is called which typically updates the DOM with the new value.
+	Once the AngularJS $digest loop finishes, the execution leaves the AngularJS and JavaScript context. 
+		This is followed by the browser re-rendering the DOM to reflect any changes.
+		
+Create/Register Service in congif function : 
+	angular.module('myModule', []).config(['$provide', function($provide) {
+	  $provide.factory('serviceId', function() {
+		var shinyNewServiceInstance;
+		// factory function body that constructs shinyNewServiceInstance
+		return shinyNewServiceInstance;
+	  });
+	}]);
+	Use case : can create service according to some setting.
+	
+Scope lifecycle : 
+	1)Scope Creation
+	2)Watch Registration
+	3)Model Mutation (Model Changes)
+	4)Mutation Observation (Observe changes in model)
+	5)Scope Destruction
+	
+2 types of dependency injection : 
+	1)Inline Array Annotation
+		module.controller("CtrlName", ["$scope", "dependency", function ($scope, $dependency) {		
+		}]);
+	2)Implicit Annotation
+		module.controller("CtrlName", function ($scope, $dependency) {		
+		});
+		not worked with js minifiers since they chnage varibale names.
+		Tools like ng-annotate let you use implicit dependency annotations in your app and automatically add inline array annotations prior to minifying.
+		If you decide to take this approach, you probably want to use ng-strict-di.
+		
+		$inject Property Annotation :
+		var MyController = function($scope, greeter) {
+		  // ...
+		}
+		MyController.$inject = ['$scope', 'greeter'];
+		someModule.controller('MyController', MyController);
+		
+JavaScript prototype vs this :
+	https://stackoverflow.com/questions/310870/use-of-prototype-vs-this-in-javascript		
+		
+One time binding
+	<p id="one-time-binding-example">One time binding: {{::name}}</p>		
+	https://docs.angularjs.org/guide/expression
+	Algorithm : 
+		Given an expression that starts with ::, when a digest loop is entered and expression is dirty-checked, store the value as V
+		If V is not undefined, mark the result of the expression as stable and schedule a task to deregister the watch for this expression 
+			when we exit the digest loop
+		Process the digest loop as normal
+		When digest loop is done and all the values have settled, process the queue of watch deregistration tasks.
+			For each watch to be deregistered, check if it still evaluates to a value that is not undefined. 
+			If that's the case, deregister the watch. 
+			Otherwise, keep dirty-checking the watch in the future digest loops by following the same algorithm starting from step 1
+			
+Data Binding : https://docs.angularjs.org/guide/interpolation
+	How text and attribute bindings work :
+		During the compilation process the compiler uses the $interpolate service to see if text nodes and element attributes contain
+			interpolation markup with embedded expressions.
+		If that is the case, the compiler adds an interpolateDirective to the node and registers watches on the computed interpolation function, 
+			which will update the corresponding text nodes or attribute values as part of the normal digest cycle.
+		Note that the interpolateDirective has a priority of 100 and sets up the watch in the preLink function.
+		
+	Binding of String :
+		undefined and null are converted to ''
+		if the value is an object that is not a Number, Date or Array, 
+			$interpolate looks for a custom toString() function on the object, and uses that. Custom means that myObject.toString !== Object.prototype.toString.
+		if the above doesn't apply, JSON.stringify is used.
+		
+	Binding of boolean attribute : 
+		</br>  Incorrect
+		Disabled: <input type="checkbox" ng-model="isDisabled" />
+		<button disabled="isDisabled">Disabled</button>
+
+		</br>  Correct              
+		Disabled: <input type="checkbox" ng-model="isngDisabled" />
+		<button ng-disabled="isngDisabled">Disabled</button>
+		
+Filters : 
+	When filters are executed : 
+		In templates, filters are only executed when their inputs have changed. 
+		This is more performant than executing a filter on each $digest as is the case with expressions.
+		There are two exceptions to this rule:
+			In general, this applies only to filters that take primitive values as inputs. 
+				Filters that receive Objects as input are executed on each $digest, as it would be too costly to track if the inputs have changed.
+			Filters that are marked as $stateful are also executed on each $digest. 
+				Note that no AngularJS core filters are $stateful.
+				
+Form : 
+	Simple form : 
+		ng-model not working until value is not valid.
+	using css classes: 
+		ng-valid: the model is valid
+		ng-invalid: the model is invalid
+		ng-valid-[key]: for each valid key added by $setValidity
+		ng-invalid-[key]: for each invalid key added by $setValidity
+		ng-pristine: the control hasn't been interacted with yet
+		ng-dirty: the control has been interacted with
+		ng-touched: the control has been blurred
+		ng-untouched: the control hasn't been blurred
+		ng-pending: any $asyncValidators are unfulfilled
+	Binding to form and control state :
+		<div ng-show="form.$submitted || form.uEmail.$touched">
+		  <span ng-show="form.uEmail.$error.required">Tell us your email.</span>
+		  <span ng-show="form.uEmail.$error.email">This is not a valid email.</span>
+		</div>
+	Custom model update triggers
+		ng-model-options="{ updateOn: 'blur' }" will update and validate only after the control loses focus.
+	Non-immediate (debounced) model updates :
+		ng-model-options="{ updateOn: 'default blur', debounce: { default: 500, blur: 0 } }"
+	Custom Validation : 
+		app.directive('integer', function() {
+		  return {
+			require: 'ngModel',
+			link: function(scope, elm, attrs, ctrl) {
+			  ctrl.$validators.integer = function(modelValue, viewValue) {
+				if (ctrl.$isEmpty(modelValue)) {
+				  // consider empty models to be valid
+				  return true;
+				}
+
+				if (INTEGER_REGEXP.test(viewValue)) {
+				  // it is valid
+				  return true;
+				}
+
+				// it is invalid
+				return false;
+			  };
+			}
+		  };
+		});
+
+		app.directive('username', function($q, $timeout) {
+		  return {
+			require: 'ngModel',
+			link: function(scope, elm, attrs, ctrl) {
+			  var usernames = ['Jim', 'John', 'Jill', 'Jackie'];
+
+			  ctrl.$asyncValidators.username = function(modelValue, viewValue) {
+
+				if (ctrl.$isEmpty(modelValue)) {
+				  // consider empty model valid
+				  return $q.resolve();
+				}
+
+				var def = $q.defer();
+
+				$timeout(function() {
+				  // Mock a delayed response
+				  if (usernames.indexOf(modelValue) === -1) {
+					// The username is available
+					def.resolve();
+				  } else {
+					def.reject();
+				  }
+
+				}, 2000);
+
+				return def.promise;
+			  };
+			}
+		  };
+		});
+		
+	
+$applyAsync : 
+	Used to delay $digest cycle for $http request
+	https://blog.thoughtram.io/angularjs/2015/01/14/exploring-angular-1.3-speed-up-with-applyAsync.html
+	
+$digest cycle starts when following event occurs : 
+	User Interaction through events - The user clicks UI controls like buttons and in turn triggers something in our application that changes state.
+	XMLHttpRequests - Also known as AJAX. Something in our app requests some data from a server and update model data accordingly.
+	Timeouts - Asynchronous operations cause through timers that can possibly change the state of our application
+	

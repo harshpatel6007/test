@@ -1,0 +1,29 @@
+Class  
+	A class is the blueprint from which individual objects are created.
+	extends should be before implements
+	
+	Instance/Member variables: class fields
+	Local variable: declared inside method of block
+	Parameter: method declaration variables
+	arguments: actual variables passed during invoking method
+	
+Constructor : 
+	will call non argument constructor of super class
+	super() or this() should be placed in first line
+	super() or this() can't be used in same constructor
+	
+Access Modifiers : 
+	At the top level—public, or package-private (no explicit modifier). (class)
+	At the member level—public, private, protected, or package-private (no explicit modifier).
+	
+Nested Classes : 
+	Static
+	Inner classes
+	
+Local Classes : 
+	decelare class inside method
+	anonymous classes
+	
+Inheritance : 
+	return type : can return subtype (covariant return type)
+	Access modifier : can increase

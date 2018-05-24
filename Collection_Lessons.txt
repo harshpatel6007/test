@@ -1,0 +1,78 @@
+Collection Lessons : 
+	Collection : 
+		Interface
+			Basic Operation : 
+				size, isEmpty, contains, add, remove, iterator
+			collection operation : 
+				addAll, containsAll, removeAll, retainAll, clear
+			Array operation : 
+				toArray - convert to array of object
+				toArray(T[] t) - convert to array of T
+		
+	Set : 
+		HashSet
+		TreeSet
+		LinkedHashSet
+		
+		If you add any ineteger from 0-16 in set it will always get same position as integer value.
+			Ex : 0 with get 0th position
+				1 will get 1st position
+			set.add(3); set.add(2); set.add(1);
+			set = [1,2,3]
+			
+		Has same functionality as in collection
+			
+	List : 
+		positional access
+			get, set, add, addall, remove
+		search 
+			indexof, lastindexof
+		iterator
+			iterator, listiterator(iterate in reverse order)
+		Range view 
+			sublist
+			
+		ArrayList
+		LinkedList
+		
+		Array opeartion : 
+			Arrays.asList(arr) return Arrays.ArrayList which extends AbtractList which throww error on add, remove
+			
+		Sublist : 
+			whatever u add in sublist will reflect in main list as well
+			if u add element once u create sublist, sublist will throw error
+			
+	Iterator : 
+		set, remove, next, hasNext
+	ListIterator : 
+		set, remove, next, hasNext, previous, hasPrevious, previousIndex, nextIndex
+		ListIterator<Integer> listIterator = list.listIterator(list.size());
+		while(listIterator.hasPrevious()) {
+			System.out.println(listIterator.next());//Throws not such element exception
+			System.out.println(listIterator.previous() + " next index " + listIterator.nextIndex() + " Previous Index : " + listIterator.previousIndex());
+			list.add(12); //this statement does not throw error
+		}
+		add, set additional methods
+		set can't be used with add/remove in same block, throw illegal state exception
+		
+	Queue : 
+		LinkedList (Insertion Order - FIFO)
+		PriorityQueue (Sorted Order - )
+		
+		Type of Operation	Throws exception	Returns special value
+		Insert				add(e)				offer(e)
+		Remove				remove()			poll()
+		Examine				element()			peek()
+		
+		Bounded Queue : 
+			has limit
+			java.util.concurrent Package
+			
+		Unbounded Queue : 
+			java.util package
+			
+		do not allow to add null except Linkedlist (should not be used due toi conflict with return type of method)
+		
+	Deque:
+		ArrayDeque
+		LinkedList
