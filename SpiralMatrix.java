@@ -14,13 +14,12 @@ public class SpiralMatrix {
 		
 		int i = 0, j = rows;
 		
-		while(i < (j - 1)) {
+		//we have to loop for half size of min of row or column
+		while(i < j/2) {
 			int row = i, column = i;
 			//print horizontal
-			if(row < rows) {
-				for(;column < columns; column++) {
-					System.out.print(matrix[row][column] + " ");
-				}
+			for(;column < columns; column++) {
+				System.out.print(matrix[row][column] + " ");
 			}
 			
 			column--;
@@ -32,12 +31,10 @@ public class SpiralMatrix {
 			
 			row--;
 			column--;
-			if(row > i) {
-				//print reverse horizontal
-				for(; column >= i; column--) {
-					System.out.print(matrix[row][column] + " ");
-				}		
-			}
+			//print reverse horizontal
+			for(; column >= i; column--) {
+				System.out.print(matrix[row][column] + " ");
+			}		
 			
 			column++;
 			row--;
