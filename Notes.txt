@@ -1,0 +1,32 @@
+
+
+PUT vs POST
+
+	PUT call is Idempotent : 
+		From a RESTful service standpoint, for an operation (or service call) to be idempotent, clients can make that same call repeatedly while producing the same result. In other words, making multiple identical requests has the same effect as making a single request. Note that while idempotent operations produce the same result on the server (no side effects), the response itself may not be the same (e.g. a resource's state may change between requests).
+		
+		The PUT and DELETE methods are defined to be idempotent. However, there is a caveat on DELETE. The problem with DELETE, which if successful would normally return a 200 (OK) or 204 (No Content), will often return a 404 (Not Found) on subsequent calls, unless the service is configured to "mark" resources for deletion without actually deleting them. However, when the service actually deletes the resource, the next call will not find the resource to delete it and return a 404. However, the state on the server is the same after each DELETE call, but the response is different.
+		
+		GET, HEAD, OPTIONS and TRACE methods are defined as safe, meaning they are only intended for retrieving data. This makes them idempotent as well since multiple, identical requests will behave the same.
+		
+Choose Mongo Over RDBMS
+
+	You Expect a High Write Load
+		Mongo DB has higher insert rate than rdbms
+	You need High Availability in an Unreliable Environment (Cloud and Real Life)
+		Setting replicaSet (set of servers that act as Master-Slaves) is easy and fast. Moreover, recovery from a node (or a data center) failure is instant, safe and automatic
+	You need to Grow Big (and Shard Your Data)
+		Databases scaling is hard (a single MySQL table performance will degrade when crossing the 5-10GB per table). If you need to partition and shard your database, MongoDB has a built in easy solution for that.
+	Your Data is Location Based
+		MongoDB has built in spacial functions, so finding relevant data from specific locations is fast and accurate.
+	Your Data Set is Going to be Big (starting from 1GB) and Schema is Not Stable
+		Adding new columns to RDBMS can lock the entire database in some database, or create a major load and performance degradation in other. Usually it happens when table size is larger than 1GB (and can be major pain for a system like BillRun that is described bellow and has several TB in a single table). As MongoDB is schema-less, adding a new field, does not effect old rows (or documents) and will be instant. Other plus is that you do not need a DBA to modify your schema when application changes.
+	
+Comparable
+	- public int compareTo(T o);
+	- used when we want to use our object in TreeSet or TreeMap
+	
+Comparator
+	- int compare(T o1, T o2);
+	- Used when we need to cpkare third party classes
+		
