@@ -30,3 +30,12 @@ Comparator
 	- int compare(T o1, T o2);
 	- Used when we need to cpkare third party classes
 		
+Why use Generics
+	- Elimination of casts.
+	- Stronger type checks at compile time.
+	- Enabling programmers to implement generic algorithms.
+	
+Use Intrfaces over Classes to declare Collection
+	- List<String>  list = new ArrayList();
+		- Its Encapsulation hiding implementation details
+		- Loosely coupled code		
