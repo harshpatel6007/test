@@ -27,3 +27,8 @@ Local Classes :
 Inheritance : 
 	return type : can return subtype (covariant return type)
 	Access modifier : can increase
+
+Thread : 
+	Threads calling non-static synchronized methods in the same class will only block each other if they're invoked using the same 			instance. That's because they each lock on this instance, and if they're called using two different instances, they get 		two locks, which do not interfere with each other.
+	Threads calling static synchronized methods in the same class will always block each other—they all lock on the same Class 			instance.
+	A static synchronized method and a non-static synchronized method will not block each other, ever. The static method locks on a 		Class instance while the non-static method locks on the this instance—these actions do not interfere with each other at 		all.
